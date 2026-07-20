@@ -61,23 +61,24 @@ def voxel_baseline(grid: int = GRID):
 def cli() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("task", type=str, default="dlbs_age", nargs="?")
-    parser.add_argument("--limit", type=int, default=16, help="max images to load")
+    parser.add_argument(
+        "--limit", type=int, default=None, help="max images to load (default: all)"
+    )
     parser.add_argument("--folds", type=int, default=4)
     parser.add_argument("--device", type=str, default="cpu")
     args = parser.parse_args()
 
-    main(
-        "voxel_baseline",
-        args.task,
-        overrides=[
-            f"task_kwargs.limit={args.limit}",
-            f"task_kwargs.n_splits={args.folds}",
-            f"device={args.device}",
-            "num_workers=0",
-            "batch_size=2",
-            "name=smoke__voxel_baseline__" + args.task,
-        ],
-    )
+    overrides = [
+        f"task_kwargs.n_splits={args.folds}",
+        f"device={args.device}",
+        "num_workers=0",
+        "batch_size=2",
+        "name=smoke__voxel_baseline__" + args.task,
+    ]
+    if args.limit is not None:
+        overrides.append(f"task_kwargs.limit={args.limit}")
+
+    main("voxel_baseline", args.task, overrides=overrides)
 
 
 if __name__ == "__main__":
