@@ -23,6 +23,18 @@ downloaded; drop it for the full 464-image wave-1 set.
 Artifacts land in `output/eval_linear/smoke__voxel_baseline__<task>/`
 (`summary.csv`, `metrics.json`, `config.yaml`, `log.txt`).
 
+## Recorded baseline
+
+Full DLBS wave-1 T1w set, 5-fold KFold, seed 4466, CPU:
+
+| model | task | n | r2 | r2_std |
+|---|---|---|---|---|
+| voxel_baseline | dlbs_age | 464 | 0.4927 | 0.2208 |
+
+Per-fold r2: 0.063, 0.522, 0.582, 0.619, 0.678. Fold 0 is the outlier — with
+512 features over ~371 training samples the ridge fit is fold-sensitive, so
+treat this as an order-of-magnitude floor rather than a precise number.
+
 ## Reproducing the real model evaluation
 
 The smoke run does not reproduce sMRI MAE numbers. That additionally requires:
