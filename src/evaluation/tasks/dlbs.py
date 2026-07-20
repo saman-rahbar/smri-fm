@@ -12,10 +12,12 @@ from evaluation.tasks.registry import register_task
 ROOT = "openneuro.org/ds004856"
 
 
-def load_dlbs_t1w() -> Dataset:
+def load_dlbs_t1w(limit: int | None = None) -> Dataset:
     files = importlib.resources.files("evaluation.tasks.resources")
     with files.joinpath("dlbs_wave1_t1w_images.txt").open() as f:
         paths = f.read().strip().splitlines()
+    if limit is not None:
+        paths = paths[:limit]
 
     columns = {
         "AgeMRI_W1": Value("int32"),
@@ -66,22 +68,22 @@ def _generate_dlbs_t1w_samples(paths: list[str], columns: tuple[str]):
 
 
 @register_task
-def dlbs_age(n_splits: int = 5, seed: int = 0) -> ColumnTask:
+def dlbs_age(n_splits: int = 5, seed: int = 0, limit: int | None = None) -> ColumnTask:
     return ColumnTask(
         name="dlbs_age",
         kind="regression",
-        data=load_dlbs_t1w(),
+        data=load_dlbs_t1w(limit),
         splitter=KFold(n_splits=n_splits, shuffle=True, random_state=seed),
         target_column="AgeMRI_W1",
     )
 
 
 @register_task
-def dlbs_sex(n_splits: int = 5, seed: int = 0) -> ColumnTask:
+def dlbs_sex(n_splits: int = 5, seed: int = 0, limit: int | None = None) -> ColumnTask:
     return ColumnTask(
         name="dlbs_sex",
         kind="classification",
-        data=load_dlbs_t1w(),
+        data=load_dlbs_t1w(limit),
         splitter=StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=seed),
         target_column="Sex",
     )

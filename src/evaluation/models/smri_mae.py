@@ -58,11 +58,13 @@ class SmriMaeTransform:
         """
         TODO(mihir): check
         """
-        # reorient to RAS
-        img = nib.as_closest_canonical(img)
+        # reorient to RAS. datasets' Nifti1ImageWrapper can't be rebuilt by nibabel's
+        # reorientation (its __init__ takes only the wrapped image), so unwrap first.
+        img = nib.as_closest_canonical(nib.Nifti1Image.from_image(img))
 
         # note, shape is (X, Y, Z) in contiguous F-order
-        data = img.get_fdata(dtype=np.float32)
+        # reorientation can flip axes, leaving negative strides that from_numpy rejects
+        data = np.ascontiguousarray(img.get_fdata(dtype=np.float32))
         data = torch.from_numpy(data)
         spacing = img.header.get_zooms()
 
